@@ -74,13 +74,13 @@ def test_load_config_rejects_wrong_typed_fields(
 
 
 def test_valid_server_config_loads_and_round_trips(tmp_path: Path) -> None:
-    text = '[server]\nhost = "127.0.0.1"\nport = 8080\nauth_key = "tok"\n'
+    text = '[server]\nhost = "localhost"\nport = 8080\nauth_key = "tok"\n'
     path = tmp_path / "config.toml"
     path.write_text(text, encoding="utf-8")
 
     cfg = load_config(path)
 
-    assert cfg.server.host == "127.0.0.1"
+    assert cfg.server.host == "localhost"
     assert cfg.server.port == 8080
     assert cfg.server.auth_key == "tok"
 
