@@ -100,7 +100,7 @@ def test_process_tool_reports_a_bad_limit_as_an_error(processes: list[FakeProces
     from windows_mcp.tools import process as process_tool
 
     mcp = FastMCP("t")
-    process_tool.register(mcp, get_desktop=lambda: None, get_analytics=lambda: None)
+    process_tool.register(mcp, get_desktop=lambda: None)
     with pytest.raises(ToolError, match="limit must be at least 1"):
         asyncio.run(mcp.call_tool("Process", {"mode": "list", "limit": 0}))
 

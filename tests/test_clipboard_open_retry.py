@@ -48,7 +48,7 @@ def clipboard_module(monkeypatch):
     if sys.platform != "win32":
         # windows_mcp.infrastructure starts the UIA worker on import; stub what the tool uses.
         infra = types.ModuleType("windows_mcp.infrastructure")
-        infra.with_analytics = lambda *a, **k: lambda f: f
+        infra.run_tool = lambda *a, **k: lambda f: f
         monkeypatch.setitem(sys.modules, "windows_mcp.infrastructure", infra)
         # windows_mcp.tools/__init__ imports every Windows-only tool; load this module alone.
         path = Path(__file__).parents[1] / "src" / "windows_mcp" / "tools" / "clipboard.py"
@@ -65,7 +65,7 @@ def clipboard_module(monkeypatch):
 def run(clipboard, monkeypatch, fake, args):
     monkeypatch.setitem(sys.modules, "win32clipboard", fake)
     mcp = FastMCP("t")
-    clipboard.register(mcp, get_desktop=lambda: None, get_analytics=lambda: None)
+    clipboard.register(mcp, get_desktop=lambda: None)
     return asyncio.run(mcp.call_tool("Clipboard", args))
 
 

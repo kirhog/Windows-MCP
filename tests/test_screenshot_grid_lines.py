@@ -103,7 +103,7 @@ def server(monkeypatch) -> FastMCP:
     monkeypatch.setattr(snapshot, "screenshot_tool", snapshot.screenshot_tool)
     desktop = make_desktop(white_image())
     mcp = FastMCP("grid-lines")
-    snapshot.register(mcp, get_desktop=lambda: desktop, get_analytics=lambda: None)
+    snapshot.register(mcp, get_desktop=lambda: desktop)
     return mcp
 
 

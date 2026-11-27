@@ -51,8 +51,8 @@ def server(monkeypatch, desktop, captures) -> FastMCP:
     monkeypatch.setattr(snapshot, "state_tool", snapshot.state_tool)
     monkeypatch.setattr(snapshot, "screenshot_tool", snapshot.screenshot_tool)
     mcp = FastMCP("list-arguments")
-    app.register(mcp, get_desktop=lambda: desktop, get_analytics=lambda: None)
-    snapshot.register(mcp, get_desktop=lambda: desktop, get_analytics=lambda: None)
+    app.register(mcp, get_desktop=lambda: desktop)
+    snapshot.register(mcp, get_desktop=lambda: desktop)
     return mcp
 
 

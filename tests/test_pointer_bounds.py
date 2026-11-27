@@ -56,8 +56,8 @@ class FakeMCP:
 
 def _tools(desktop: Desktop) -> dict[str, Callable]:
     mcp = FakeMCP()
-    input_tools.register(mcp, get_desktop=lambda: desktop, get_analytics=lambda: None)
-    multi_tools.register(mcp, get_desktop=lambda: desktop, get_analytics=lambda: None)
+    input_tools.register(mcp, get_desktop=lambda: desktop)
+    multi_tools.register(mcp, get_desktop=lambda: desktop)
     return mcp.tools
 
 

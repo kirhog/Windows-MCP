@@ -5,7 +5,7 @@ import logging
 from mcp.types import ToolAnnotations
 from windows_mcp.desktop.utils import as_bool as _as_bool
 from windows_mcp.desktop.utils import as_int_list as _as_int_list
-from windows_mcp.infrastructure import with_analytics
+from windows_mcp.infrastructure import run_tool
 from fastmcp import Context
 
 from windows_mcp.tools._snapshot_helpers import (
@@ -22,7 +22,7 @@ state_tool = None
 screenshot_tool = None
 
 
-def register(mcp, *, get_desktop, get_analytics):
+def register(mcp, *, get_desktop):
     global state_tool, screenshot_tool
     @mcp.tool(
         name='Snapshot',
@@ -39,7 +39,7 @@ def register(mcp, *, get_desktop, get_analytics):
         # characters stays near Claude Code's default 25,000-token output cap.
         meta={"anthropic/maxResultSizeChars": 100_000},
     )
-    @with_analytics(get_analytics(), "State-Tool", run_sync_in_thread=False)
+    @run_tool(run_sync_in_thread=False)
     def _state_tool(
         use_vision: bool | str = False,
         use_dom: bool | str = False,
@@ -98,7 +98,7 @@ def register(mcp, *, get_desktop, get_analytics):
             openWorldHint=False,
         ),
     )
-    @with_analytics(get_analytics(), "Screenshot-Tool")
+    @run_tool()
     def _screenshot_tool(
         use_annotation: bool | str = False,
         width_reference_line: int | None = None,

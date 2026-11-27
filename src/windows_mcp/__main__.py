@@ -64,7 +64,6 @@ def _echo_section(title: str) -> None:
 
 desktop: Any | None = None
 watchdog: Any | None = None
-analytics: Any | None = None
 screen_size: Any | None = None
 _mcp: FastMCP | None = None
 _control_config = ControlConfig()
@@ -97,10 +96,6 @@ destructive changes with the user first.
 
 def _get_desktop():
     return desktop
-
-
-def _get_analytics():
-    return analytics
 
 
 def _http_middleware(
@@ -279,7 +274,6 @@ def _build_mcp() -> FastMCP:
         return _mcp
 
     try:
-        from windows_mcp.infrastructure import PostHogAnalytics
         from windows_mcp.desktop.service import Desktop
         from windows_mcp.tools import register_all
     except ModuleNotFoundError as exc:
@@ -361,12 +355,10 @@ def _build_mcp() -> FastMCP:
     @asynccontextmanager
     async def lifespan(app: FastMCP):
         """Runs initialization code before the server starts and cleanup code after it shuts down."""
-        global desktop, watchdog, analytics, screen_size
+        global desktop, watchdog, screen_size
         nonlocal control_loop
         control_loop = asyncio.get_running_loop()
 
-        if os.getenv("ANONYMIZED_TELEMETRY", "true").lower() != "false":
-            analytics = PostHogAnalytics()
         desktop = Desktop()
         screen_size = desktop.get_screen_size()
 
@@ -398,16 +390,14 @@ def _build_mcp() -> FastMCP:
                     if controller.enabled:
                         control_overlay.stop()
                 finally:
-                    logger.debug("Shutting down: stopping watchdog and analytics")
+                    logger.debug("Shutting down: stopping watchdog")
                     if watchdog:
                         watchdog.stop()
-                    if analytics:
-                        await analytics.close()
                     control_loop = None
 
     _mcp = FastMCP(name="windows-mcp", instructions=instructions, lifespan=lifespan)
     _mcp.add_middleware(ControlToolGate(controller, notifier, ask_consent=ask_consent))
-    register_all(_mcp, get_desktop=_get_desktop, get_analytics=_get_analytics)
+    register_all(_mcp, get_desktop=_get_desktop)
     return _mcp
 
 
@@ -611,7 +601,7 @@ def main():
 @click.option(
     "--host",
     help="Host to bind the SSE/Streamable HTTP server.",
-    default="localhost",
+    default="127.0.0.1",
     type=str,
     show_default=True,
 )
@@ -801,7 +791,7 @@ def serve(
     )
 
     transport = _choose_value(ctx, "transport", transport, cfg.server.transport, "stdio")
-    host = _choose_value(ctx, "host", host, cfg.server.host, "localhost")
+    host = _choose_value(ctx, "host", host, cfg.server.host, "127.0.0.1")
     port = int(_choose_value(ctx, "port", port, cfg.server.port, 8000))
     auth_key = _choose_value(ctx, "auth_key", auth_key, cfg.server.auth_key, None)
     stateless_http = bool(
@@ -1165,7 +1155,7 @@ def uninstall() -> None:
 )
 @click.option(
     "--host",
-    default="0.0.0.0",
+    default="127.0.0.1",
     show_default=True,
     help="Host to bind the server to.",
 )

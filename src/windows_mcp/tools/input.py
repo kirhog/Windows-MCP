@@ -9,7 +9,7 @@ from typing import Any, Literal
 
 from mcp.types import ToolAnnotations
 from windows_mcp.desktop.utils import as_bool as _as_bool
-from windows_mcp.infrastructure import with_analytics
+from windows_mcp.infrastructure import run_tool
 from fastmcp import Context
 
 
@@ -216,7 +216,6 @@ def register(
     mcp: Any,
     *,
     get_desktop: Callable[[], Any],
-    get_analytics: Callable[[], Any],
 ) -> None:
     @mcp.tool(
         name="Click",
@@ -234,7 +233,7 @@ def register(
             openWorldHint=False,
         ),
     )
-    @with_analytics(get_analytics(), "Click-Tool", run_sync_in_thread=False)
+    @run_tool(run_sync_in_thread=False)
     def click_tool(
         loc: list[int] | str | None = None,
         label: int | None = None,
@@ -272,7 +271,7 @@ def register(
             openWorldHint=False,
         ),
     )
-    @with_analytics(get_analytics(), "Type-Tool", run_sync_in_thread=False)
+    @run_tool(run_sync_in_thread=False)
     def type_tool(
         text: str,
         loc: list[int] | str | None = None,
@@ -314,7 +313,7 @@ def register(
             openWorldHint=False,
         ),
     )
-    @with_analytics(get_analytics(), "Scroll-Tool", run_sync_in_thread=False)
+    @run_tool(run_sync_in_thread=False)
     def scroll_tool(
         loc: list[int] | str | None = None,
         label: int | None = None,
@@ -357,7 +356,7 @@ def register(
             openWorldHint=False,
         ),
     )
-    @with_analytics(get_analytics(), "Move-Tool", run_sync_in_thread=False)
+    @run_tool(run_sync_in_thread=False)
     def move_tool(
         loc: list[int] | str | None = None,
         label: int | None = None,
@@ -421,7 +420,7 @@ def register(
             openWorldHint=False,
         ),
     )
-    @with_analytics(get_analytics(), "Shortcut-Tool")
+    @run_tool()
     def shortcut_tool(shortcut: str, ctx: Context = None):
         get_desktop().shortcut(shortcut)
         return f"Pressed {shortcut}."
@@ -437,7 +436,7 @@ def register(
             openWorldHint=False,
         ),
     )
-    @with_analytics(get_analytics(), "Wait-Tool")
+    @run_tool()
     def wait_tool(duration: int, ctx: Context = None) -> str:
         time.sleep(duration)
         return f"Waited for {duration} seconds."
@@ -458,7 +457,7 @@ def register(
             openWorldHint=False,
         ),
     )
-    @with_analytics(get_analytics(), "WaitFor-Tool", run_sync_in_thread=False)
+    @run_tool(run_sync_in_thread=False)
     def wait_for_tool(
         condition: str,
         text: str | None = None,

@@ -32,7 +32,7 @@ class FakeMCP:
 @pytest.fixture
 def file_system() -> Callable[..., str]:
     mcp = FakeMCP()
-    register(mcp, get_desktop=lambda: MagicMock(), get_analytics=lambda: None)
+    register(mcp, get_desktop=lambda: MagicMock())
     tool = mcp.tools["FileSystem"]
     return lambda **kwargs: asyncio.run(tool(**kwargs))
 

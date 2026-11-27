@@ -29,7 +29,6 @@ from windows_mcp.tools.control_policy import CLASSIFIED_TOOLS, MODES, requires_c
             "Registry",
             "Snapshot",
             "Screenshot",
-            "Scrape",
             "Wait",
             "WaitFor",
             "DisplayInventory",
@@ -70,7 +69,7 @@ def test_unknown_and_status(policy):
 @pytest.mark.asyncio
 async def test_registration_and_mode_coverage():
     mcp = FastMCP("policy-coverage")
-    register_all(mcp, get_desktop=lambda: None, get_analytics=lambda: None)
+    register_all(mcp, get_desktop=lambda: None)
     async with Client(mcp) as client:
         tools = await client.list_tools()
     assert {tool.name for tool in tools} == CLASSIFIED_TOOLS

@@ -4,8 +4,8 @@ The server instructions tell agents to act "by loc=[x, y] or label=<element id> 
 Snapshot". A label is an element's place in the element lists of the state the Desktop keeps
 (Desktop.desktop_state), and every capture replaced that state, not only Snapshot. After a
 Screenshot, which collects no elements, every label of the last Snapshot was out of range.
-After WaitFor, or Scrape with use_dom=True, the labels indexed a UI tree that the caller never
-saw, so a label could send the click to another element.
+After WaitFor, the labels indexed a UI tree that the caller never saw, so a label could send
+the click to another element.
 
 Nothing here touches the real desktop: the displays, the windows, the cursor, the UI tree, the
 virtual desktops and the capture are stand-ins, and Desktop.click is a mock.
@@ -21,13 +21,10 @@ from PIL import Image
 
 from windows_mcp.desktop.service import Desktop
 from windows_mcp.tools import input as input_tools
-from windows_mcp.tools import scrape as scrape_tools
 from windows_mcp.tools import snapshot as snapshot_tools
 from windows_mcp.tree.views import (
     BoundingBox,
-    ScrollElementNode,
     SemanticNode,
-    TextElementNode,
     TreeElementNode,
     TreeState,
 )
@@ -98,32 +95,6 @@ NOTEPAD_TREE = ui_tree((NOTEPAD, [SAVE, CANCEL]))
 DISMISS = button("Dismiss", "File saved", make_box(1700, 930, 1780, 970))
 NOTIFICATION_TREE = ui_tree(("File saved", [DISMISS]), (NOTEPAD, [SAVE, CANCEL]))
 
-EDGE = "Example Domain - Microsoft Edge"
-BACK = button("Back", EDGE, make_box(0, 40, 40, 80))
-REFRESH = button("Refresh", EDGE, make_box(80, 40, 120, 80))  # center (100,60)
-BROWSER_TREE = ui_tree((EDGE, [BACK, REFRESH]))
-# Scrape(use_dom=True) walks the page instead of the browser's own controls.
-PAGE = make_box(0, 120, 1920, 1040)
-PAGE_TREE = ui_tree(
-    (
-        EDGE,
-        [
-            button("More information", EDGE, make_box(380, 300, 520, 330)),
-            button("Search", EDGE, make_box(380, 400, 520, 430)),
-        ],
-    ),
-    dom_node=ScrollElementNode(
-        name="Example Domain",
-        control_type="DocumentControl",
-        window_name=EDGE,
-        bounding_box=PAGE,
-        center=PAGE.get_center(),
-        metadata={"vertical_scrollable": False},
-    ),
-    dom_informative_nodes=[TextElementNode(text="Example Domain")],
-)
-
-
 @pytest.fixture
 def desktop(monkeypatch: pytest.MonkeyPatch) -> Desktop:
     """A Desktop over stand-ins; desktop.tree.get_state gives the UI tree of each capture."""
@@ -155,8 +126,8 @@ def tools(desktop: Desktop, monkeypatch: pytest.MonkeyPatch) -> dict[str, Callab
     monkeypatch.setattr(snapshot_tools, "state_tool", snapshot_tools.state_tool)
     monkeypatch.setattr(snapshot_tools, "screenshot_tool", snapshot_tools.screenshot_tool)
     mcp = FakeMCP()
-    for module in (snapshot_tools, input_tools, scrape_tools):
-        module.register(mcp, get_desktop=lambda: desktop, get_analytics=lambda: None)
+    for module in (snapshot_tools, input_tools):
+        module.register(mcp, get_desktop=lambda: desktop)
     return mcp.tools
 
 
@@ -205,20 +176,6 @@ def test_wait_for_keeps_the_labels_of_the_last_snapshot(
 
     # Label 1 is Cancel, as the Snapshot showed, not Save, the second element WaitFor saw.
     assert asyncio.run(tools["Click"](label=1)) == "Single left clicked at (530,350)."
-
-
-def test_scrape_with_dom_keeps_the_labels_of_the_last_snapshot(
-    desktop: Desktop, tools: dict[str, Callable]
-) -> None:
-    desktop.tree.get_state.side_effect = [BROWSER_TREE, PAGE_TREE]
-    snapshot = asyncio.run(tools["Snapshot"]())
-    assert '[#1] (100,60) button "Refresh"' in snapshot[0]
-
-    page = asyncio.run(tools["Scrape"](url="https://example.com", use_dom=True, use_sampling=False))
-    assert "Example Domain" in page
-
-    # Label 1 is the browser's Refresh button, not the Search button on the page Scrape walked.
-    assert asyncio.run(tools["Click"](label=1)) == "Single left clicked at (100,60)."
 
 
 def test_each_snapshot_sets_the_labels(desktop: Desktop, tools: dict[str, Callable]) -> None:

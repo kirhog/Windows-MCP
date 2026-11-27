@@ -3,13 +3,13 @@
 from typing import Literal
 
 from mcp.types import ToolAnnotations
-from windows_mcp.infrastructure import with_analytics
+from windows_mcp.infrastructure import run_tool
 from windows_mcp import registry
 from windows_mcp.registry import RegistryType
 from fastmcp import Context
 
 
-def register(mcp, *, get_desktop, get_analytics):
+def register(mcp, *, get_desktop):
     @mcp.tool(
         name='Registry',
         description='Read and write the Windows Registry. Keywords: regedit, registry key, HKEY, HKCU, HKLM, Windows settings, registry value. Use mode="get" to read a value (the answer names its type and shows it as stored, in the form set takes: ExpandString keeps its %VARIABLES%, Binary is .reg hex), mode="set" to create/update a value, mode="delete" to remove a value or key, mode="list" to list values and sub-keys under a path. For type="Binary", value lists bytes in decimal or 0x hex separated by commas or spaces ("1, 2, 0xff"), or in .reg notation ("hex:01,02,ff"); for type="MultiString", put each string on its own line. Paths use PowerShell format (e.g. "HKCU:\\Software\\MyApp", "HKLM:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion").',
@@ -21,7 +21,7 @@ def register(mcp, *, get_desktop, get_analytics):
             openWorldHint=False,
         ),
     )
-    @with_analytics(get_analytics(), "Registry-Tool")
+    @run_tool()
     def registry_tool(
         mode: Literal['get', 'set', 'delete', 'list'],
         path: str,

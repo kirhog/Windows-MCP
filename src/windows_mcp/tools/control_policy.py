@@ -13,7 +13,6 @@ OTHER = frozenset(
         "Registry",
         "Snapshot",
         "Screenshot",
-        "Scrape",
         "Wait",
         "WaitFor",
         "DisplayInventory",

@@ -124,7 +124,7 @@ async def test_all_exits_revoke_before_releasing_lease(ending):
 async def test_mcp_client_termination_revokes_running_worker(ending):
     """Use the real MCP in-memory transport; only desktop effects are simulated."""
     from fastmcp import Client, FastMCP
-    from windows_mcp.infrastructure.analytics import with_analytics
+    from windows_mcp.infrastructure import run_tool
 
     owner, gate, _ = make_gate()
     mcp = FastMCP("request-lifetime")
@@ -134,7 +134,7 @@ async def test_mcp_client_termination_revokes_running_worker(ending):
     effects = []
 
     @mcp.tool(name="Click")
-    @with_analytics(None, "simulated-input", run_sync_in_thread=False)
+    @run_tool(run_sync_in_thread=False)
     def operation():
         try:
             owner.checkpoint_current()

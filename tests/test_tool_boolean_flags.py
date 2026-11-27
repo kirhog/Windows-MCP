@@ -17,7 +17,6 @@ from windows_mcp.tools import snapshot as snapshot_module
 from windows_mcp.tools.filesystem import register as register_filesystem
 from windows_mcp.tools.multi import register as register_multi
 from windows_mcp.tools.process import register as register_process
-from windows_mcp.tools.scrape import register as register_scrape
 
 
 class FakeMCP:
@@ -34,7 +33,7 @@ class FakeMCP:
 
 def _tools(register) -> dict[str, Callable]:
     mcp = FakeMCP()
-    register(mcp, get_desktop=lambda: MagicMock(), get_analytics=lambda: None)
+    register(mcp, get_desktop=lambda: MagicMock())
     return mcp.tools
 
 
@@ -64,7 +63,7 @@ def test_unparsable_press_ctrl_selects_nothing():
     desktop = MagicMock()
     desktop.desktop_state = object()
     mcp = FakeMCP()
-    register_multi(mcp, get_desktop=lambda: desktop, get_analytics=lambda: None)
+    register_multi(mcp, get_desktop=lambda: desktop)
 
     with pytest.raises(ValueError, match="press_ctrl must be true or false"):
         asyncio.run(mcp.tools["MultiSelect"](locs=[[10, 10], [40, 40]], press_ctrl="yes"))
@@ -72,7 +71,7 @@ def test_unparsable_press_ctrl_selects_nothing():
     desktop.multi_select.assert_not_called()
 
 
-# Snapshot, Screenshot, Scrape and Process kept the same inline rule.
+# Snapshot, Screenshot and Process kept the same inline rule.
 
 
 @pytest.fixture
@@ -102,30 +101,6 @@ def test_unparsable_snapshot_flag_captures_nothing(snapshot_captures, tool, flag
 
     assert f"{flag} must be true or false" in result[0]
     assert snapshot_captures == []
-
-
-def test_padded_true_scrapes_the_browser_dom():
-    desktop = MagicMock()
-    desktop.get_state.return_value.tree_state.dom_node = None
-    mcp = FakeMCP()
-    register_scrape(mcp, get_desktop=lambda: desktop, get_analytics=lambda: None)
-
-    result = asyncio.run(mcp.tools["Scrape"](url="https://example.com", use_dom=" TRUE "))
-
-    assert result.startswith("No DOM information found")
-    desktop.scrape.assert_not_called()
-
-
-def test_unparsable_use_dom_fetches_nothing():
-    desktop = MagicMock()
-    mcp = FakeMCP()
-    register_scrape(mcp, get_desktop=lambda: desktop, get_analytics=lambda: None)
-
-    with pytest.raises(ValueError, match="use_dom must be true or false"):
-        asyncio.run(mcp.tools["Scrape"](url="https://example.com", use_dom="yes"))
-
-    desktop.scrape.assert_not_called()
-    desktop.get_state.assert_not_called()
 
 
 def test_process_force_is_parsed_strictly(monkeypatch):

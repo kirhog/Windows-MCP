@@ -105,7 +105,7 @@ def test_multiedit_tool_refuses_a_number_before_any_input(
     sent: list[str], arguments: dict[str, object]
 ) -> None:
     mcp = FakeMCP()
-    register(mcp, get_desktop=make_desktop, get_analytics=lambda: None)
+    register(mcp, get_desktop=make_desktop)
 
     with pytest.raises(ValueError, match=REFUSED):
         asyncio.run(mcp.tools["MultiEdit"](**arguments))

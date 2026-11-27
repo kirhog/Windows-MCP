@@ -100,7 +100,7 @@ async def test_positioning_failure_is_mcp_error(
     monkeypatch.setattr(core, "mouse_event", event)
     monkeypatch.setattr(core, "SendKeys", keys)
     server = FastMCP("cursor-failure-test")
-    register(server, get_desktop=lambda: desktop, get_analytics=lambda: None)
+    register(server, get_desktop=lambda: desktop)
 
     async with Client(server) as client:
         result = await client.call_tool(tool, arguments, raise_on_error=False)

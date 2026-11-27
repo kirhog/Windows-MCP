@@ -421,7 +421,7 @@ class NotingDesktop:
 
 def test_type_tool_appends_the_desktop_note() -> None:
     mcp = FakeMCP()
-    register(mcp, get_desktop=lambda: NotingDesktop(), get_analytics=lambda: None)
+    register(mcp, get_desktop=lambda: NotingDesktop())
 
     result = asyncio.run(mcp.tools["Type"](text="EF", loc=[100, 100], clear=True))
 

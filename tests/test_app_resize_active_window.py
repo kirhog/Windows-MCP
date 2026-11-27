@@ -118,7 +118,7 @@ def test_resize_without_name_reports_no_window_when_the_desktop_is_in_front(desk
 async def test_app_tool_resizes_the_foreground_window_after_a_screenshot(desktop):
     desktop.desktop_state = _state(None, [])
     server = FastMCP("app-resize-test")
-    app.register(server, get_desktop=lambda: desktop, get_analytics=lambda: None)
+    app.register(server, get_desktop=lambda: desktop)
 
     async with Client(server) as client:
         result = await client.call_tool("App", {"mode": "resize", "window_size": [640, 480]})

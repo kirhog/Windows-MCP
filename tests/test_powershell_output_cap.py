@@ -142,7 +142,7 @@ class FakeMCP:
 
 def _shell_tool() -> Callable:
     mcp = FakeMCP()
-    shell_module.register(mcp, get_desktop=lambda: None, get_analytics=lambda: None)
+    shell_module.register(mcp, get_desktop=lambda: None)
     return mcp.tools["PowerShell"]
 
 

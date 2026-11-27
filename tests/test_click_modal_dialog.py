@@ -115,7 +115,7 @@ def test_the_click_tool_repeats_the_warning(monkeypatch: pytest.MonkeyPatch) -> 
     desktop = MagicMock()
     desktop.click.return_value = "Warning: the window under the point is disabled."
     mcp = FakeMCP()
-    register(mcp, get_desktop=lambda: desktop, get_analytics=lambda: None)
+    register(mcp, get_desktop=lambda: desktop)
 
     answer = asyncio.run(mcp.tools["Click"](loc=[10, 20]))
 

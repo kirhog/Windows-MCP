@@ -6,7 +6,7 @@ from windows_mcp.desktop.control import get_controller
 from windows_mcp.infrastructure.thread_affinity import uia_worker_status
 
 
-def register(mcp, *, get_desktop, get_analytics):
+def register(mcp, *, get_desktop):
     @mcp.tool(
         name="ControlStatus",
         description="Get desktop control owner, enabled state, gate policy, configured idle timeout and remaining user idle wait in seconds. AI control has no time limit: it lasts until the user takes over or release=true hands the desktop back, so release when the desktop work is done or before waiting on the user. Settings are read-only and changes require a server restart.",

@@ -106,7 +106,7 @@ async def test_control_status_reports_ui_busy_and_releases_lease_on_busy_error(m
 
     mcp = FastMCP("worker-status-test")
     mcp.add_middleware(ControlToolGate(owner, ControlNotifier(owner)))
-    register_control_status(mcp, get_desktop=lambda: None, get_analytics=lambda: None)
+    register_control_status(mcp, get_desktop=lambda: None)
 
     entered = threading.Event()
     release = threading.Event()

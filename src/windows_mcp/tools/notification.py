@@ -4,12 +4,12 @@ from typing import Annotated
 
 from mcp.types import ToolAnnotations
 from pydantic import Field
-from windows_mcp.infrastructure import with_analytics
+from windows_mcp.infrastructure import run_tool
 from fastmcp import Context
 from windows_mcp import notifications
 
 
-def register(mcp, *, get_desktop, get_analytics):
+def register(mcp, *, get_desktop):
     @mcp.tool(
         name="Notification",
         description="Sends a Windows toast notification. Requires title, message, and app_id (a registered Windows AppUserModelID). Find available IDs with PowerShell: Get-StartApps | Select-Object Name, AppID. Avoid unnecessary notifications that interrupt the user; relaxed control policy does not gate this tool.",
@@ -21,7 +21,7 @@ def register(mcp, *, get_desktop, get_analytics):
             openWorldHint=False,
         ),
     )
-    @with_analytics(get_analytics(), "Notification-Tool")
+    @run_tool()
     def notification_tool(
         title: Annotated[
             str,

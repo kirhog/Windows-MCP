@@ -121,7 +121,6 @@ These tools only read information without making changes:
 |------|------|-------------|
 | **Snapshot** | Safe | Only captures desktop state and screenshots |
 | **Wait** | Safe | Only pauses execution |
-| **Scrape** | Safe* | Fetches web content (*may expose browsing activity) |
 
 ## Best Practices
 
@@ -156,7 +155,6 @@ These tools only read information without making changes:
 ### 5. **Data Protection**
 
 - Be aware that **Snapshot** captures screenshots that may contain sensitive information
-- **Scrape** may fetch content from untrusted websites
 - Avoid using Windows-MCP in environments with highly sensitive data
 - Consider disabling screenshot functionality (`use_vision=False`) when handling confidential information
 
@@ -254,7 +252,6 @@ Windows-MCP relies on several third-party libraries. We:
 - **comtypes / uia**: Low-level Windows UIAutomation COM bindings for UI interaction and accessibility-tree traversal
 - **FastMCP**: MCP server framework (stdio, SSE, Streamable HTTP transports)
 - **Starlette / Uvicorn**: ASGI layer used by the HTTP transports; provides CORS, TrustedHost, and custom auth middleware
-- **httpx**: HTTP client used by the Scrape tool for web content fetching
 
 ## Compliance and Auditing
 
@@ -268,24 +265,9 @@ Windows-MCP does not implement comprehensive audit logging by default. For compl
 
 ### Telemetry and Data Privacy
 
-- Windows-MCP collects anonymous usage data to help improve the MCP server.
-- **We collect:**
-  - Tool execution status (success/failure)
-  - Execution duration
-  - Tool name
-  - Client name and version (e.g., Claude Desktop, etc.)
-  - Anonymized session IDs
-- **We DO NOT collect:**
-  - **Tool arguments** (text typed, coordinates, file paths, etc.)
-  - **Tool outputs** (screenshots, commands results, page content, etc.)
-  - **Personal Information**:
-    - **No User Identifiers** beyond a randomly generated UUID stored locally.
-- **Privacy Considerations:**
-  - **Error Messages**: In rare cases, system error messages (which are captured) may include local file paths if they are part of the OS error description.
-  - Telemetry is **enabled by default** to help maintainers understand usage patterns and prioritize features, but can be disabled at any time by setting the `ANONYMIZED_TELEMETRY` environment variable to `false`.
-  - Windows-MCP processes all commands locally on your machine.
-  - Screenshots and state captures remain strictly on your local system.
-  - Web scraping may expose browsing activity to the target websites.
+- This build collects no telemetry and sends no data off the machine.
+- Windows-MCP processes all commands locally on your machine.
+- Screenshots and state captures remain strictly on your local system.
 
 ## Tool Annotations Reference
 

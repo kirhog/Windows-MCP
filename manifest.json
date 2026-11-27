@@ -33,7 +33,6 @@
       "env": {
         "UV_NO_SYNC": "1",
         "UV_CACHE_DIR": "${__dirname}/.uv-cache",
-        "ANONYMIZED_TELEMETRY": "${user_config.anonymized_telemetry}",
         "WINDOWS_MCP_PROFILE_SNAPSHOT": "${user_config.profile_snapshot}",
         "WINDOWS_MCP_SCREENSHOT_BACKEND": "${user_config.screenshot_backend}",
         "WINDOWS_MCP_DEBUG": "${user_config.debug}",
@@ -42,13 +41,6 @@
     }
   },
   "user_config": {
-    "anonymized_telemetry": {
-      "type": "boolean",
-      "title": "Anonymized Telemetry",
-      "description": "Windows-MCP collects basic usage data to help improve the MCP server. No personal information, tool arguments, or tool outputs are tracked.",
-      "required": false,
-      "default": true
-    },
     "profile_snapshot": {
       "type": "boolean",
       "title": "Profile Snapshot Performance",
@@ -134,10 +126,6 @@
     {
       "name": "WaitFor",
       "description": "Waits until a UI condition is met by polling the accessibility tree inside a single call, avoiding repeated Snapshot calls. Conditions: text_exists, active_window, element_exists, element_enabled, focused_element. Provide text and/or window_name depending on the condition. Set use_dom=True to match browser DOM text."
-    },
-    {
-      "name": "Scrape",
-      "description": "Fetch content from a URL or the active browser tab. By default, performs a lightweight HTTP request to the URL. If you need to extract text from the active tab's DOM within the viewport, ensure the page is open in a browser and use Snapshot with use_dom=True first, then the agent will handle extraction. Use Screenshot for the default fast visual inspection path."
     },
     {
       "name": "MultiSelect",

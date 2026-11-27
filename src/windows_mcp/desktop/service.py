@@ -22,12 +22,9 @@ from windows_mcp.tree.service import Tree, _excluded_process_names, _window_proc
 from windows_mcp.desktop import screenshot as screenshot_capture
 from windows_mcp.desktop.control import get_controller
 from windows_mcp.desktop import flash_overlay
-from windows_mcp.infrastructure import safe_get
 from windows_mcp.desktop import control_overlay
-from urllib.parse import urljoin
 from locale import getpreferredencoding
 from typing import Literal
-from markdownify import markdownify
 from fuzzywuzzy import process
 from time import sleep, time, perf_counter
 from psutil import Process
@@ -35,7 +32,6 @@ import math
 import win32process
 import win32gui
 import win32con
-import requests
 import logging
 import random
 import ctypes
@@ -84,10 +80,6 @@ _KEY_ALIASES = {
 
 # Characters with a meaning in SendKeys syntax; they must be braced to be literal.
 _SENDKEYS_SYNTAX_CHARS = set("{}()")
-
-# Scrape converts only these to Markdown; any other body is returned as fetched.
-_HTML_MEDIA_TYPES = frozenset({"text/html", "application/xhtml+xml"})
-
 
 def _shortcut_to_sendkeys(shortcut: str) -> str:
     """Translate "ctrl+shift+comma" style input into a SendKeys string.
@@ -369,7 +361,7 @@ class Desktop:
         if update_labels:
             # Click, Type, Scroll, Move and the Multi tools resolve label=<id> against the
             # elements of this state, so only a Snapshot that lists them replaces it. A
-            # Screenshot, WaitFor or Scrape capture must not renumber what the caller saw.
+            # Screenshot or WaitFor capture must not renumber what the caller saw.
             self.desktop_state = desktop_state
         if profile_enabled:
             state_build_ms = (perf_counter() - stage_started_at) * 1000
@@ -1384,37 +1376,6 @@ class Desktop:
             note = self.type((x, y), text=text, clear=True)
             notes.append(note.replace("Warning:", f"Warning at ({x},{y}):"))
         return notes
-
-    def scrape(self, url: str) -> str:
-        current_url = url
-        try:
-            for _ in range(5):
-                response = safe_get(current_url, timeout=10)
-                if not response.is_redirect:
-                    break
-                current_url = urljoin(current_url, response.headers["Location"])
-            else:
-                raise ValueError("Too many redirects while fetching URL")
-            response.raise_for_status()
-        except requests.exceptions.HTTPError as e:
-            raise ValueError(f"HTTP error for {current_url}: {e}") from e
-        except requests.exceptions.ConnectionError as e:
-            raise ConnectionError(f"Failed to connect to {current_url}: {e}") from e
-        except requests.exceptions.Timeout as e:
-            raise TimeoutError(f"Request timed out for {current_url}: {e}") from e
-        has_charset = "charset" in response.headers.get("content-type", "").lower()
-        if not has_charset and response.encoding == "ISO-8859-1":
-            # requests assumes ISO-8859-1 for ``text/*`` without a charset
-            # (RFC 2616) and ignores the in-document ``<meta charset>``, so
-            # non-ASCII pages come back as mojibake. Sniff the body instead.
-            response.encoding = response.apparent_encoding or "utf-8"
-        # markdownify reads any other body as one HTML text node: it collapses
-        # line breaks and indentation and escapes "_" and "*", which mangles
-        # JSON, source files and plain text. A missing type keeps the old path.
-        media_type = response.headers.get("content-type", "").split(";")[0].strip().lower()
-        if media_type and media_type not in _HTML_MEDIA_TYPES:
-            return response.text
-        return markdownify(html=response.text)
 
     def is_overlay_window(self, element: uia.Control) -> bool:
         """Return True if the window is a decorative overlay rather than a real app window.

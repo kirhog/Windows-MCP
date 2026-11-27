@@ -119,7 +119,7 @@ def test_unusable_raw_event_does_not_count(monkeypatch):
 async def test_mcp_affine_tool_continues_below_threshold_and_stops_at_threshold(last_step, blocked):
     """Real MCP gate and UIA dispatch; physical input effects are simulated."""
     from fastmcp import Client, FastMCP
-    from windows_mcp.infrastructure.analytics import with_analytics
+    from windows_mcp.infrastructure import run_tool
     from windows_mcp.tools.control_notifications import ControlNotifier, ControlToolGate
 
     owner = control.ControlCoordinator()
@@ -130,7 +130,7 @@ async def test_mcp_affine_tool_continues_below_threshold_and_stops_at_threshold(
     effects = []
 
     @mcp.tool(name="Click")
-    @with_analytics(None, "simulated-input", run_sync_in_thread=False)
+    @run_tool(run_sync_in_thread=False)
     def operation():
         stamp = control.time.monotonic()
         owner._handle(("raw", 1, 300, 0, stamp))

@@ -1,12 +1,7 @@
-"""Infrastructure layer — cross-cutting concerns: auth, security, analytics, config, oauth."""
+"""Infrastructure layer — cross-cutting concerns: auth, security, tool dispatch, config, oauth."""
 
 from windows_mcp.infrastructure.auth import AuthKeyMiddleware, OAuthOnlyMiddleware, is_loopback_host
-from windows_mcp.infrastructure.security import (
-    IPAllowlistMiddleware,
-    parse_ip_allowlist,
-    safe_get,
-    validate_url,
-)
+from windows_mcp.infrastructure.security import IPAllowlistMiddleware, parse_ip_allowlist
 from windows_mcp.infrastructure.thread_affinity import (
     UIAWorkerBusyError,
     is_uia_thread,
@@ -14,7 +9,7 @@ from windows_mcp.infrastructure.thread_affinity import (
     uia_thread_id,
     uia_worker_status,
 )
-from windows_mcp.infrastructure.analytics import Analytics, PostHogAnalytics, with_analytics
+from windows_mcp.infrastructure.dispatch import run_tool
 from windows_mcp.infrastructure.config import (
     WindowsMCPConfig,
     ServerConfig,
@@ -35,16 +30,12 @@ __all__ = [
     "is_loopback_host",
     "IPAllowlistMiddleware",
     "parse_ip_allowlist",
-    "safe_get",
-    "validate_url",
     "UIAWorkerBusyError",
     "is_uia_thread",
     "run_uia_affine",
     "uia_thread_id",
     "uia_worker_status",
-    "Analytics",
-    "PostHogAnalytics",
-    "with_analytics",
+    "run_tool",
     "WindowsMCPConfig",
     "ServerConfig",
     "SecurityConfig",

@@ -4,7 +4,7 @@ import time
 from typing import Literal
 
 from mcp.types import ToolAnnotations
-from windows_mcp.infrastructure import with_analytics
+from windows_mcp.infrastructure import run_tool
 from fastmcp import Context
 from fastmcp.exceptions import ToolError
 
@@ -35,7 +35,7 @@ def _open_clipboard(win32clipboard, *, attempts: int = OPEN_ATTEMPTS) -> None:
             time.sleep(OPEN_BASE_DELAY * (2**attempt))
 
 
-def register(mcp, *, get_desktop, get_analytics):
+def register(mcp, *, get_desktop):
     @mcp.tool(
         name="Clipboard",
         description='Copy/paste clipboard operations. Keywords: copy, paste, cut, clipboard, text transfer. Use mode="get" to read current clipboard content, mode="set" to set clipboard text. This is the real Windows clipboard; set overwrites shared contents. Avoid using it merely to pass data between tools and coordinate known interference with the user.',
@@ -47,7 +47,7 @@ def register(mcp, *, get_desktop, get_analytics):
             openWorldHint=False,
         ),
     )
-    @with_analytics(get_analytics(), "Clipboard-Tool")
+    @run_tool()
     def clipboard_tool(
         mode: Literal["get", "set"],
         text: str | None = None,

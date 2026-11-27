@@ -51,7 +51,7 @@ class _SlowExecutor:
 def _server(monkeypatch, executor) -> FastMCP:
     monkeypatch.setattr(shell_module, "PowerShellExecutor", executor)
     mcp = FastMCP(name="progress-test")
-    shell_module.register(mcp, get_desktop=lambda: None, get_analytics=lambda: None)
+    shell_module.register(mcp, get_desktop=lambda: None)
     return mcp
 
 
@@ -310,7 +310,7 @@ def test_a_failing_output_callback_does_not_change_the_result():
 async def test_real_powershell_command_reports_its_output(monkeypatch):
     monkeypatch.setattr(_shell_progress, "PROGRESS_INTERVAL_SECONDS", 0.5)
     mcp = FastMCP(name="progress-real")
-    shell_module.register(mcp, get_desktop=lambda: None, get_analytics=lambda: None)
+    shell_module.register(mcp, get_desktop=lambda: None)
     messages: list[str] = []
 
     async def on_progress(progress, total, message):

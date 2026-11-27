@@ -11,7 +11,6 @@ from windows_mcp.tools import (
     notification,
     process,
     registry,
-    scrape,
     shell,
     snapshot,
 )
@@ -24,7 +23,6 @@ _MODULES = [
     filesystem,
     snapshot,
     input,
-    scrape,
     multi,
     clipboard,
     process,
@@ -33,12 +31,12 @@ _MODULES = [
 ]
 
 
-def register_all(mcp, *, get_desktop, get_analytics):
+def register_all(mcp, *, get_desktop):
     """Register every tool module on *mcp*.
 
-    *get_desktop* and *get_analytics* are zero-arg callables that return the
-    current ``Desktop`` and ``PostHogAnalytics`` instances (resolved lazily so
-    that tools can be registered before ``lifespan`` initializes the singletons).
+    *get_desktop* is a zero-arg callable that returns the current ``Desktop``
+    instance (resolved lazily so that tools can be registered before ``lifespan``
+    initializes the singleton).
     """
     for mod in _MODULES:
-        mod.register(mcp, get_desktop=get_desktop, get_analytics=get_analytics)
+        mod.register(mcp, get_desktop=get_desktop)

@@ -1,7 +1,7 @@
 """PowerShell tool — shell/command execution."""
 
 from mcp.types import ToolAnnotations
-from windows_mcp.infrastructure import with_analytics
+from windows_mcp.infrastructure import run_tool
 from windows_mcp.powershell import COMMAND_TIMED_OUT, PowerShellExecutor
 from windows_mcp.tools._shell_progress import run_with_progress
 from fastmcp import Context
@@ -42,7 +42,7 @@ def cap_output(text: str, max_output: int) -> str:
     return text[:head] + marker + text[-tail:]
 
 
-def register(mcp, *, get_desktop, get_analytics):
+def register(mcp, *, get_desktop):
     @mcp.tool(
         name="PowerShell",
         description="Shell/command execution. Keywords: shell, run, execute, cmd, terminal, command line, script. A comprehensive system tool for executing any PowerShell commands. Use it to navigate the file system, manage files and processes, and execute system-level operations. Capable of accessing web content (e.g., via Invoke-WebRequest), interacting with network resources, and performing complex administrative tasks. This tool provides full access to the underlying operating system capabilities, making it the primary interface for system automation, scripting, and deep system interaction. Under relaxed control policy this tool is not desktop-gated. Prefer background execution; coordinate with the user before commands known to interfere with their desktop, reusing existing authorization. Output longer than max_output characters is cut to its head and tail with a marker reporting how much was omitted; a command ended by the timeout reports Status Code: timed out (distinct from a failure exit code) and includes whatever it printed before ending. A timeout ends the command and the console programs it was running; programs it started to run on their own (GUI programs, Start-Process without -NoNewWindow) keep running.",
@@ -54,7 +54,7 @@ def register(mcp, *, get_desktop, get_analytics):
             openWorldHint=True,
         ),
     )
-    @with_analytics(get_analytics(), "Powershell-Tool")
+    @run_tool()
     async def powershell_tool(
         command: str,
         timeout: int = 30,
@@ -63,7 +63,7 @@ def register(mcp, *, get_desktop, get_analytics):
     ) -> str:
         # Async so progress notifications go out from the event loop while the
         # command blocks a worker thread (#579); without a progressToken this
-        # is the same worker-thread call with_analytics used to make.
+        # is the same worker-thread call run_tool makes.
         response, status_code = await run_with_progress(
             ctx, PowerShellExecutor.execute_command, command, timeout, timeout=timeout
         )

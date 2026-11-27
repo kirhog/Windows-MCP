@@ -41,7 +41,6 @@ async def test_disabled_stdio_background_command_and_status(tmp_path, policy):
         keep_alive=False,
         env={
             **os.environ,
-            "ANONYMIZED_TELEMETRY": "false",
             "WINDOWS_MCP_WATCHDOG": "false",
             "PYTHONPATH": str(root / "src"),
         },

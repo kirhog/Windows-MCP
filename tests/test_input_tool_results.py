@@ -36,7 +36,7 @@ def desktop() -> MagicMock:
 
 def _call(desktop: MagicMock, tool: str, **kwargs: object) -> str:
     mcp = FakeMCP()
-    register(mcp, get_desktop=lambda: desktop, get_analytics=lambda: None)
+    register(mcp, get_desktop=lambda: desktop)
     return asyncio.run(mcp.tools[tool](**kwargs))
 
 

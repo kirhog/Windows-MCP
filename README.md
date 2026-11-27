@@ -403,12 +403,6 @@ npm install -g @anthropic-ai/claude-code
   $env:MCP_TIMEOUT = "120000"; claude
   ```
 
-  **Environment variables.** Pass settings with `--env`, for example to turn off telemetry:
-
-  ```shell
-  claude mcp add --transport stdio --env ANONYMIZED_TELEMETRY=false windows-mcp -- uvx windows-mcp serve
-  ```
-
   **Large results.** Claude Code warns when a tool result passes 10,000 tokens and caps it at 25,000 (`MAX_MCP_OUTPUT_TOKENS`); text over 50,000 characters is saved to a file instead, except `Snapshot`, which allows up to 100,000 characters inline. Prefer `Screenshot` over `Snapshot` when you only need to see the screen, pass `region` or `display` to capture less, and lower `WINDOWS_MCP_MAX_TREE_ELEMENTS` if UI trees are too large.
 
   **WSL (Windows Subsystem for Linux)**
@@ -685,7 +679,7 @@ is still accepted for compatibility but no longer affects takeover.
 | `balanced` (B) | Everything in A, plus PowerShell, Notification, App `launch`/`launch_executable`, Process `kill`, and Clipboard `set`. |
 | `strict` (C) | All tools except ControlStatus, matching the previous gate behavior. |
 
-FileSystem, Registry, Snapshot, Screenshot, Scrape, Wait, WaitFor, DisplayInventory,
+FileSystem, Registry, Snapshot, Screenshot, Wait, WaitFor, DisplayInventory,
 Process `list`, and Clipboard `get` bypass ownership in A and B. This classification
 concerns desktop interference, not permissions or data safety. PowerShell can still
 operate the UI, and file/registry operations can have other side effects.
@@ -731,9 +725,6 @@ windows-mcp auth --transport streamable-http --host 0.0.0.0 --port 8000 --with-t
 ```
 
 This command writes the auth key into the config file, can generate `cert.pem` and `key.pem`, and prints an example MCP client configuration for the selected transport.
-
-### SSRF Protection
-`Scrape` tool blocks: private IPs, loopback, link-local, credentials-in-URLs, non-HTTP schemes.
 
 ---
 
@@ -812,14 +803,6 @@ sampling filters transient readings but cannot distinguish persistent query fail
 | `WINDOWS_MCP_OAUTH_CLIENT_SECRET` | _(none)_ | OAuth client secret for HTTP transports. Must be provided with `WINDOWS_MCP_OAUTH_CLIENT_ID`. |
 | `WINDOWS_MCP_STATELESS_HTTP` | `false` | Set to `1`, `true`, `yes`, or `on` to run `streamable-http` without `Mcp-Session-Id` connection state. Useful for reconnects after restarts and for horizontally scaled deployments. |
 
-### Telemetry
-
-| Variable | Default | Description |
-|---|---|---|
-| `ANONYMIZED_TELEMETRY` | `true` | Set to `false` to disable anonymous usage telemetry. No personal data, tool arguments, or outputs are ever collected regardless of this setting. |
-| `POSTHOG_API_KEY` | Project default | Override the PostHog project write key used for anonymous telemetry. Set to an empty string to skip PostHog client initialization. |
-| `POSTHOG_HOST` | `https://us.i.posthog.com` | Override the PostHog host for anonymous telemetry, such as for a self-hosted PostHog deployment. |
-
 ### Debug
 
 | Variable | Default | Description |
@@ -892,7 +875,6 @@ MCP Client can access the following tools to interact with Windows:
 - `App`: Launch an application by Start Menu name or strictly by executable path with separated argv and optional cwd; resize, move, and switch between windows.
 - `PowerShell`: To execute PowerShell commands.
 - `FileSystem`: Read, write, copy, move, delete, list, search, and inspect files and directories.
-- `Scrape`: To scrape the entire webpage for information.
 - `MultiSelect`: Select multiple items (files, folders, checkboxes) with optional Ctrl key. Uses bulk label-to-coordinate resolution when labels are provided.
 - `MultiEdit`: Enter text into multiple input fields at specified coordinates. Uses bulk label-to-coordinate resolution when labels are provided.
 - `Clipboard`: Read or set Windows clipboard content.
@@ -965,30 +947,7 @@ Please read our [Security Policy](SECURITY.md).
 
 ## 📊 Telemetry
 
-Windows-MCP collects usage data to help improve the MCP server. No personal information, no tool arguments, no outputs are tracked.
-
-To disable telemetry, set `ANONYMIZED_TELEMETRY` to `false` in your MCP client configuration:
-
-```json
-{
-  "mcpServers": {
-    "windows-mcp": {
-      "command": "uvx",
-      "args": [
-        "windows-mcp",
-        "serve"
-      ],
-      "env": {
-        "ANONYMIZED_TELEMETRY": "false"
-      }
-    }
-  }
-}
-```
-
-See the [Environment Variables](#-environment-variables) section for the full list of configurable options.
-
-For detailed information on what data is collected and how it is handled, please refer to the [Telemetry and Data Privacy](SECURITY.md#telemetry-and-data-privacy) section in our Security Policy.
+This build sends no telemetry. The server makes no outgoing network connections, and the HTTP transports bind to `127.0.0.1` unless `--host` says otherwise.
 
 ## 📝 Limitations
 

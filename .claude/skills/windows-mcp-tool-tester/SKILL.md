@@ -4,7 +4,7 @@ description: >
   Automated testing skill for Windows-MCP tools. Use this skill whenever the user wants to test,
   validate, benchmark, or evaluate any Windows-MCP tool (App, PowerShell, Screenshot, Snapshot,
   Click, Type, Scroll, Move, Shortcut, Wait, MultiSelect, MultiEdit, Clipboard, Process,
-  Notification, FileSystem, Registry, Scrape). Triggers on phrases like "test the Click tool",
+  Notification, FileSystem, Registry). Triggers on phrases like "test the Click tool",
   "benchmark Screenshot", "validate FileSystem", "run QA on Registry", "check if PowerShell works",
   "evaluate tool performance", or any mention of testing/validating a Windows-MCP tool.
   Each invocation tests exactly ONE tool.
@@ -37,7 +37,7 @@ and actionable recommendations.
 If the user hasn't specified a tool, present the full list and ask them to pick one:
 
 > App, PowerShell, Screenshot, Snapshot, Click, Type, Scroll, Move, Shortcut, Wait,
-> MultiSelect, MultiEdit, Clipboard, Process, Notification, FileSystem, Registry, Scrape
+> MultiSelect, MultiEdit, Clipboard, Process, Notification, FileSystem, Registry
 
 Once a tool is confirmed, proceed to Step 1. Do NOT test multiple tools in one session.
 
@@ -237,7 +237,7 @@ Run each test case sequentially. For each test:
    - **Process (kill)**: verify with PowerShell (`Get-Process -Id $pid`)
      — never with the Process tool itself.
    - **Shortcut**: call Screenshot to verify the shortcut's expected effect occurred.
-   - For read-only tools (Screenshot, Snapshot, Scrape, Process list), this step is not needed.
+   - For read-only tools (Screenshot, Snapshot, Process list), this step is not needed.
    - If verification fails but the tool reported success, mark the test as **FAIL** and note
      "tool reported success but side effect not confirmed" in the root cause analysis.
 9. **Teardown** — clean up any side effects (delete temp files, close apps, etc.)
@@ -456,7 +456,7 @@ To avoid polluting the system or interfering with user state:
   (e.g., Notepad) to receive input. Don't interact with user's active work.
   See also Pre-Test Step 2 for IME state handling — switch to English input mode before testing
   and restore the original state in final teardown.
-- **Read-only tools (Screenshot, Snapshot, Scrape)**: Safe to run freely.
+- **Read-only tools (Screenshot, Snapshot)**: Safe to run freely.
 - **Notification tests**: User-visible (sends Windows toasts). Avoid repeated or unnecessary
   notifications. Prefer a single clearly labeled test notification per test case.
 - **PowerShell tests**: Use read-only commands where possible.
@@ -577,9 +577,3 @@ Hints per tool. Always read the actual schema to discover additional scenarios b
 - Different value types (String, DWord, QWord)
 - Non-existent key/value
 - Use test-only registry path
-
-### Scrape
-- With a URL (lightweight page)
-- With and without query parameter
-- With use_dom enabled (requires open browser)
-- Invalid URL
