@@ -1,3 +1,8 @@
+> **This fork has ALL telemetry removed, and every outgoing connection with it.** No PostHog analytics, no
+> usage or error reports, no persistent user id, and no `Scrape` tool that fetches web pages; the network
+> transports listen on `127.0.0.1` only. The changes are on the `local-only` branch; the original project is
+> [CursorTouch/Windows-MCP](https://github.com/CursorTouch/Windows-MCP).
+
 <div align="center">
   <h1>🪟 Windows-MCP</h1>
 
