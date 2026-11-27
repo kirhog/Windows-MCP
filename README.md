@@ -467,6 +467,34 @@ See [🔐 Security & Access Control](#-security--access-control) for all options
 | `sse` | `serve --transport sse --host HOST --port PORT` | Network-accessible via Server-Sent Events |
 | `streamable-http` | `serve --transport streamable-http --host HOST --port PORT` | Network-accessible via HTTP streaming (recommended for production) |
 
+### Reaching it from another machine over ssh (`relay`)
+
+The desktop tools need the signed-in desktop session, so `serve` over an ssh session fails with
+"No active interactive desktop". The `relay` command bridges the two: the server runs in the
+desktop (`windows-mcp install`, on `127.0.0.1` only), and an MCP client on another machine starts
+`windows-mcp relay` through ssh. The relay speaks stdio to the client and passes every call to the
+local server, adding the auth key from `~/.windows-mcp/config.toml`. Nothing listens on the
+network but sshd, and the key never leaves the Windows machine.
+
+On the Windows machine, once:
+
+```shell
+windows-mcp install                # the server, started at every sign-in, on 127.0.0.1:8000
+windows-mcp auth                   # a key in config.toml; restart the server to apply it
+setx FASTMCP_JSON_RESPONSE true    # plain JSON answers: a screenshot is over the 1 MB SSE event limit of the relay's client
+```
+
+On the client (Claude Code):
+
+```shell
+claude mcp add --scope user windows-desktop -- \
+  ssh -T -o BatchMode=yes user@windows-host 'C:\path\to\venv\Scripts\windows-mcp.exe' relay
+```
+
+`--port` picks another local server port. Restarting the server: `schtasks /end` stops the task's
+wrapper but not its `python.exe`; stop that process by its PID, then `schtasks /run /tn
+windows-mcp-server`.
+
 ---
 
 ## 🔐 Security & Access Control

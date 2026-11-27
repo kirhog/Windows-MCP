@@ -1252,5 +1252,28 @@ def auth(transport: str, host: str, port: int, with_tls: bool, force: bool) -> N
         )
 
 
+@main.command()
+@click.option(
+    "--port",
+    default=8000,
+    show_default=True,
+    type=int,
+    help="Port of the local streamable-http server to relay to.",
+)
+def relay(port: int) -> None:
+    """Relay MCP over stdio to the server running in this machine's desktop session.
+
+    Meant to be started by an MCP client through ssh, so the client reaches the desktop server
+    without a network port of its own and the auth key never leaves this machine.
+    """
+    from fastmcp.client.transports import StreamableHttpTransport
+    from fastmcp.server.server import create_proxy
+
+    key = load_config(CONFIG_FILE).server.auth_key if CONFIG_FILE.exists() else None
+    headers = {"Authorization": f"Bearer {key}"} if key else {}
+    backend = StreamableHttpTransport(f"http://127.0.0.1:{port}/mcp", headers=headers)
+    create_proxy(backend, name="windows-mcp-relay").run(transport="stdio", show_banner=False)
+
+
 if __name__ == "__main__":
     main()
